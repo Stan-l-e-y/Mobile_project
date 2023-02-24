@@ -1,0 +1,7 @@
+{
+  "name": "RemindMeMobile",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
