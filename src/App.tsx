@@ -24,6 +24,7 @@ import './theme/variables.css';
 import SignUp from './pages/SignUp';
 import LogIn from './pages/LogIn';
 import CreateTask from './pages/CreateTask';
+import EditTask from './pages/EditTask';
 
 setupIonicReact();
 
@@ -37,6 +38,7 @@ const App: React.FC = () => (
         <Route exact path="/createtask" component={CreateTask} />
         <Route exact path="/signup" component={SignUp} />
         <Route exact path="/login" component={LogIn} />
+        <Route path="/edittask/:id" component={EditTask} />
         <Route exact path="/">
           <Redirect to="/home" />
         </Route>

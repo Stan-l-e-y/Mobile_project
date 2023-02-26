@@ -3,3 +3,15 @@
   --background-activated: var(--ion-color-green-700);
   --background: var(--ion-color-green-600);
 }
+
+.datePicker {
+  margin: 24px 0px 0px 0px;
+}
+
+.statusSelect {
+  margin: 18px 0px 0px 0px;
+}
+
+/* ion-select {
+  --padding-top: 12px;
+} */

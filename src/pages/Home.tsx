@@ -25,7 +25,7 @@ import { add, checkmarkCircle, trash } from 'ionicons/icons';
 import { RouteComponentProps } from 'react-router';
 import Task from '../components/Task';
 
-const Home: React.FC<RouteComponentProps> = (props) => {
+const Home: React.FC<RouteComponentProps> = ({ history }) => {
   return (
     <IonPage>
       <IonHeader>
@@ -44,7 +44,7 @@ const Home: React.FC<RouteComponentProps> = (props) => {
             <IonButtons collapse={true} slot="end">
               <IonButton
                 className="navAction"
-                onClick={() => props.history.push('/login')}
+                onClick={() => history.push('/login')}
               >
                 Log Out
               </IonButton>
@@ -78,9 +78,87 @@ const Home: React.FC<RouteComponentProps> = (props) => {
               </IonItemOption>
             </IonItemOptions>
           </IonItemSliding>
+
+          <IonItemSliding>
+            <IonItemOptions side="start">
+              <IonItemOption color="success">
+                <IonIcon slot="icon-only" icon={checkmarkCircle}></IonIcon>
+              </IonItemOption>
+            </IonItemOptions>
+
+            <Task
+              task={{
+                id: 2,
+                name: 'Walk dog',
+                description: '',
+                progress: 'IN-PROGRESS',
+                createdAt: 'today',
+                dueDate: 'tomorrow',
+                isPastDue: false,
+              }}
+            />
+
+            <IonItemOptions side="end">
+              <IonItemOption color="danger">
+                <IonIcon slot="icon-only" icon={trash}></IonIcon>
+              </IonItemOption>
+            </IonItemOptions>
+          </IonItemSliding>
+
+          <IonItemSliding>
+            <IonItemOptions side="start">
+              <IonItemOption color="success">
+                <IonIcon slot="icon-only" icon={checkmarkCircle}></IonIcon>
+              </IonItemOption>
+            </IonItemOptions>
+
+            <Task
+              task={{
+                id: 3,
+                name: 'Go to gym',
+                description: 'do a lower body workout',
+                progress: 'COMPLETED',
+                createdAt: 'today',
+                dueDate: 'tomorrow',
+                isPastDue: false,
+              }}
+            />
+
+            <IonItemOptions side="end">
+              <IonItemOption color="danger">
+                <IonIcon slot="icon-only" icon={trash}></IonIcon>
+              </IonItemOption>
+            </IonItemOptions>
+          </IonItemSliding>
+
+          <IonItemSliding>
+            <IonItemOptions side="start">
+              <IonItemOption color="success">
+                <IonIcon slot="icon-only" icon={checkmarkCircle}></IonIcon>
+              </IonItemOption>
+            </IonItemOptions>
+
+            <Task
+              task={{
+                id: 3,
+                name: 'Finish book',
+                description: 'left on page 238',
+                progress: 'COMPLETED',
+                createdAt: 'today',
+                dueDate: 'tomorrow',
+                isPastDue: true,
+              }}
+            />
+
+            <IonItemOptions side="end">
+              <IonItemOption color="danger">
+                <IonIcon slot="icon-only" icon={trash}></IonIcon>
+              </IonItemOption>
+            </IonItemOptions>
+          </IonItemSliding>
         </IonList>
         <IonFab vertical="bottom" horizontal="end" slot="fixed">
-          <IonFabButton onClick={() => props.history.push('/createtask')}>
+          <IonFabButton onClick={() => history.push('/createtask')}>
             <IonIcon icon={add} />
           </IonFabButton>
         </IonFab>

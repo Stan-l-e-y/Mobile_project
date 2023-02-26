@@ -32,7 +32,7 @@ const Task: React.FC<ContainerProps> = ({ task }) => {
       </IonLabel>
       {displayBadge(task.progress, task.isPastDue)}
       {/* <IonIcon slot="end" icon={pencil}></IonIcon> */}
-      <IonButton>
+      <IonButton routerLink={`/edittask/${task.id}`}>
         <IonIcon slot="icon-only" icon={pencil}></IonIcon>
       </IonButton>
     </IonItem>

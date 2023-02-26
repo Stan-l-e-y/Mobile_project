@@ -14,7 +14,7 @@ import {
 import './Auth.css';
 import { RouteComponentProps } from 'react-router';
 
-const LogIn: React.FC<RouteComponentProps> = (props) => {
+const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
   return (
     <IonPage>
       <IonHeader>
@@ -23,7 +23,7 @@ const LogIn: React.FC<RouteComponentProps> = (props) => {
           <IonButtons slot="end">
             <IonButton
               className="navAction"
-              onClick={() => props.history.push('/signup')}
+              onClick={() => history.push('/signup')}
             >
               Register
             </IonButton>
@@ -47,7 +47,7 @@ const LogIn: React.FC<RouteComponentProps> = (props) => {
           className="submitBtn"
           expand="full"
           shape="round"
-          onClick={() => props.history.push('/')}
+          onClick={() => history.push('/')}
         >
           Submit
         </IonButton>
