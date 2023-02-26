@@ -13,3 +13,7 @@ ion-title {
 .navAction {
   padding-right: 12px;
 }
+
+ion-list {
+  margin-top: 12px;
+}

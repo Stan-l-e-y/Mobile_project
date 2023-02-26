@@ -21,9 +21,9 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import NewItem from './pages/NewItem';
 import SignUp from './pages/SignUp';
 import LogIn from './pages/LogIn';
+import CreateTask from './pages/CreateTask';
 
 setupIonicReact();
 
@@ -34,7 +34,7 @@ const App: React.FC = () => (
         <Route exact path="/home" component={Home}>
           {/* <Home /> */}
         </Route>
-        <Route exact path="/new" component={NewItem} />
+        <Route exact path="/createtask" component={CreateTask} />
         <Route exact path="/signup" component={SignUp} />
         <Route exact path="/login" component={LogIn} />
         <Route exact path="/">

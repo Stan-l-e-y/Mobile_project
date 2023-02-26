@@ -19,6 +19,7 @@
 .submitBtn {
   margin-top: 48px;
   --background-activated: var(--ion-color-green-700);
+  --background: var(--ion-color-green-600);
 }
 
 /* ion-button {

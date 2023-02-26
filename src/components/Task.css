@@ -1,0 +1,8 @@
+.status {
+  margin-right: 10px;
+}
+
+ion-button {
+  --background: none;
+  --background-activated: none;
+}

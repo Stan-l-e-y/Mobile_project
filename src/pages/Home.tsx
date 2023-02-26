@@ -23,6 +23,7 @@ import ExploreContainer from '../components/ExploreContainer';
 import './Home.css';
 import { add, checkmarkCircle, trash } from 'ionicons/icons';
 import { RouteComponentProps } from 'react-router';
+import Task from '../components/Task';
 
 const Home: React.FC<RouteComponentProps> = (props) => {
   return (
@@ -50,7 +51,7 @@ const Home: React.FC<RouteComponentProps> = (props) => {
             </IonButtons>
           </IonToolbar>
         </IonHeader>
-        <ExploreContainer />
+
         <IonList>
           <IonItemSliding>
             <IonItemOptions side="start">
@@ -59,16 +60,17 @@ const Home: React.FC<RouteComponentProps> = (props) => {
               </IonItemOption>
             </IonItemOptions>
 
-            <IonItem>
-              <IonCheckbox slot="start" />
-              <IonLabel>
-                <h1>Create Idea</h1>
-                <IonNote>Run Idea by Brandy</IonNote>
-              </IonLabel>
-              <IonBadge color="success" slot="end">
-                5 Days
-              </IonBadge>
-            </IonItem>
+            <Task
+              task={{
+                id: 1,
+                name: 'Wash Dishes',
+                description: 'try to finish by 5pm',
+                progress: 'IN-PROGRESS',
+                createdAt: 'today',
+                dueDate: 'tomorrow',
+                isPastDue: false,
+              }}
+            />
 
             <IonItemOptions side="end">
               <IonItemOption color="danger">
@@ -78,7 +80,7 @@ const Home: React.FC<RouteComponentProps> = (props) => {
           </IonItemSliding>
         </IonList>
         <IonFab vertical="bottom" horizontal="end" slot="fixed">
-          <IonFabButton onClick={() => props.history.push('/new')}>
+          <IonFabButton onClick={() => props.history.push('/createtask')}>
             <IonIcon icon={add} />
           </IonFabButton>
         </IonFab>
