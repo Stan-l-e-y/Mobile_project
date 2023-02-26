@@ -1,5 +1,7 @@
 import {
   IonBadge,
+  IonButton,
+  IonButtons,
   IonCheckbox,
   IonContent,
   IonFab,
@@ -7,6 +9,9 @@ import {
   IonHeader,
   IonIcon,
   IonItem,
+  IonItemOption,
+  IonItemOptions,
+  IonItemSliding,
   IonLabel,
   IonList,
   IonNote,
@@ -16,7 +21,7 @@ import {
 } from '@ionic/react';
 import ExploreContainer from '../components/ExploreContainer';
 import './Home.css';
-import { add } from 'ionicons/icons';
+import { add, checkmarkCircle, trash } from 'ionicons/icons';
 import { RouteComponentProps } from 'react-router';
 
 const Home: React.FC<RouteComponentProps> = (props) => {
@@ -24,27 +29,53 @@ const Home: React.FC<RouteComponentProps> = (props) => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Blank</IonTitle>
+          <IonTitle>Tasks</IonTitle>
+          <IonButtons collapse={true} slot="end">
+            <IonButton>Log Out</IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen>
+      <IonContent fullscreen={true}>
         <IonHeader collapse="condense">
+          <div className="welcome">Welcome, Bob!</div>
           <IonToolbar>
-            <IonTitle size="large">Blank</IonTitle>
+            <IonTitle size="large">Tasks</IonTitle>
+            <IonButtons collapse={true} slot="end">
+              <IonButton
+                className="navAction"
+                onClick={() => props.history.push('/login')}
+              >
+                Log Out
+              </IonButton>
+            </IonButtons>
           </IonToolbar>
         </IonHeader>
         <ExploreContainer />
         <IonList>
-          <IonItem>
-            <IonCheckbox slot="start" />
-            <IonLabel>
-              <h1>Create Idea</h1>
-              <IonNote>Run Idea by Brandy</IonNote>
-            </IonLabel>
-            <IonBadge color="success" slot="end">
-              5 Days
-            </IonBadge>
-          </IonItem>
+          <IonItemSliding>
+            <IonItemOptions side="start">
+              <IonItemOption color="success">
+                <IonIcon slot="icon-only" icon={checkmarkCircle}></IonIcon>
+              </IonItemOption>
+            </IonItemOptions>
+
+            <IonItem>
+              <IonCheckbox slot="start" />
+              <IonLabel>
+                <h1>Create Idea</h1>
+                <IonNote>Run Idea by Brandy</IonNote>
+              </IonLabel>
+              <IonBadge color="success" slot="end">
+                5 Days
+              </IonBadge>
+            </IonItem>
+
+            <IonItemOptions side="end">
+              <IonItemOption color="danger">
+                <IonIcon slot="icon-only" icon={trash}></IonIcon>
+              </IonItemOption>
+            </IonItemOptions>
+          </IonItemSliding>
         </IonList>
         <IonFab vertical="bottom" horizontal="end" slot="fixed">
           <IonFabButton onClick={() => props.history.push('/new')}>

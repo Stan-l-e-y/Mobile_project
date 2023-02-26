@@ -1,0 +1,15 @@
+ion-title.title-large {
+  text-align: center;
+}
+
+ion-title {
+  text-align: center;
+}
+
+.welcome {
+  text-align: center;
+}
+
+.navAction {
+  padding-right: 12px;
+}
