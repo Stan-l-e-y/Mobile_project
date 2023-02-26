@@ -21,6 +21,7 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import NewItem from './pages/NewItem';
 
 setupIonicReact();
 
@@ -28,9 +29,10 @@ const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
       <IonRouterOutlet>
-        <Route exact path="/home">
-          <Home />
+        <Route exact path="/home" component={Home}>
+          {/* <Home /> */}
         </Route>
+        <Route exact path="/new" component={NewItem} />
         <Route exact path="/">
           <Redirect to="/home" />
         </Route>
