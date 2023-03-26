@@ -30,28 +30,19 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Tasks</IonTitle>
+          <IonTitle size="large">Tasks</IonTitle>
           <IonButtons collapse={true} slot="end">
-            <IonButton>Log Out</IonButton>
+            <IonButton
+              className="navAction"
+              onClick={() => history.push('/login')}
+            >
+              Log Out
+            </IonButton>
           </IonButtons>
+          <div className="welcome">Welcome, Bob!</div>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen={true}>
-        <IonHeader collapse="condense">
-          <div className="welcome">Welcome, Bob!</div>
-          <IonToolbar>
-            <IonTitle size="large">Tasks</IonTitle>
-            <IonButtons collapse={true} slot="end">
-              <IonButton
-                className="navAction"
-                onClick={() => history.push('/login')}
-              >
-                Log Out
-              </IonButton>
-            </IonButtons>
-          </IonToolbar>
-        </IonHeader>
-
         <IonList>
           <IonItemSliding>
             <IonItemOptions side="start">

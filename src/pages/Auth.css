@@ -22,6 +22,13 @@
   --background: var(--ion-color-green-600);
 }
 
+.errors {
+  font-size: small;
+  color: red;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 /* ion-button {
   --background: #93e9be;
   --background-hover: #9ce0be;
