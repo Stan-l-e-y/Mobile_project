@@ -83,9 +83,8 @@ const TaskForm: React.FC<ContainerProps> = ({
         }
 
         if (data) {
-          console.log(data);
           showToast({ message: 'Successfully created!', duration: 5000 });
-          history.push('/');
+          history.push({ pathname: '/home' });
         }
         await hideLoading();
       } catch (error: any) {

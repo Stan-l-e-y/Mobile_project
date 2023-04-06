@@ -28,45 +28,78 @@ import { RouteComponentProps } from 'react-router';
 import Task from '../components/Task';
 import { supabase } from '../supa';
 import { useEffect, useState } from 'react';
+import moment from 'moment';
 
 const Home: React.FC<RouteComponentProps> = ({ history }) => {
   const [showLoading, hideLoading] = useIonLoading();
   const [showToast] = useIonToast();
   const [session] = useState(() => supabase.auth.getSession());
+  const [tasks, setTasks] = useState<any[]>([]);
 
-  const [profile, setProfile] = useState({
-    firstName: '',
-  });
+  const [profile, setProfile] = useState<any>('');
   useEffect(() => {
-    getProfile();
-  }, [session]);
-  const getProfile = async () => {
-    console.log('get');
+    const getProfile = async () => {
+      try {
+        const { data: userData, error: userError } =
+          await supabase.auth.getUser();
+        let { data, error, status } = await supabase
+          .from('profiles')
+          .select(`*`)
+          .eq('id', userData.user!.id)
+          .single();
 
-    try {
-      const { data: userData, error: userError } =
-        await supabase.auth.getUser();
-      let { data, error, status } = await supabase
-        .from('profiles')
-        .select(`first_name`)
-        .eq('id', userData.user!.id)
-        .single();
+        if (error && status !== 406) {
+          throw error;
+        }
 
-      if (error && status !== 406) {
-        throw error;
+        if (data) {
+          setProfile(data);
+        }
+        await hideLoading();
+      } catch (error: any) {
+        showToast({ message: error.message, duration: 5000 });
+        await hideLoading();
       }
+    };
+    getProfile();
+  }, [hideLoading, showToast, session]);
 
-      if (data) {
-        setProfile({
-          firstName: data.first_name,
+  useEffect(() => {
+    const getTasks = async () => {
+      const { data: taskData, error: taskError } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('user_id', profile.id);
+
+      if (taskError) console.log(taskError);
+      if (taskData) {
+        //filter tasks, if dueDate is greater than or equal today, up
+        setTasks(taskData);
+
+        tasks.map(async (task) => {
+          //update in supabase
+          if (moment(task.dueDate).toDate() <= new Date()) {
+            const { data, error } = await supabase
+              .from('tasks')
+              .update({ isPastDue: true })
+              .eq('id', task.id)
+              .select();
+
+            if (error) console.log(error);
+            console.log(data);
+            return data;
+          }
+
+          //return updated
+          return task;
         });
       }
-      await hideLoading();
-    } catch (error: any) {
-      showToast({ message: error.message, duration: 5000 });
-      await hideLoading();
+    };
+    if (profile) {
+      getTasks();
     }
-  };
+  }, [profile]);
+
   const signOut = async () => {
     await supabase.auth.signOut();
     history.push('/login');
@@ -81,114 +114,40 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
               Log Out
             </IonButton>
           </IonButtons>
-          <div className="welcome">Welcome, {profile.firstName}!</div>
+          <div className="welcome">Welcome, {profile.first_name}!</div>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen={true}>
         <IonList>
-          <IonItemSliding>
-            <IonItemOptions side="start">
-              <IonItemOption color="success">
-                <IonIcon slot="icon-only" icon={checkmarkCircle}></IonIcon>
-              </IonItemOption>
-            </IonItemOptions>
+          {tasks.map((task) => {
+            return (
+              <IonItemSliding key={task.id}>
+                <IonItemOptions side="start">
+                  <IonItemOption color="success">
+                    <IonIcon slot="icon-only" icon={checkmarkCircle}></IonIcon>
+                  </IonItemOption>
+                </IonItemOptions>
 
-            <Task
-              task={{
-                id: 1,
-                name: 'Wash Dishes',
-                description: 'try to finish by 5pm',
-                progress: 'IN-PROGRESS',
-                createdAt: 'today',
-                dueDate: 'tomorrow',
-                isPastDue: false,
-              }}
-            />
+                <Task
+                  task={{
+                    id: task.id,
+                    name: task.name,
+                    description: task.description,
+                    progress: task.progress,
+                    createdAt: task.createdAt,
+                    dueDate: task.dueDate,
+                    isPastDue: task.isPastDue,
+                  }}
+                />
 
-            <IonItemOptions side="end">
-              <IonItemOption color="danger">
-                <IonIcon slot="icon-only" icon={trash}></IonIcon>
-              </IonItemOption>
-            </IonItemOptions>
-          </IonItemSliding>
-
-          <IonItemSliding>
-            <IonItemOptions side="start">
-              <IonItemOption color="success">
-                <IonIcon slot="icon-only" icon={checkmarkCircle}></IonIcon>
-              </IonItemOption>
-            </IonItemOptions>
-
-            <Task
-              task={{
-                id: 2,
-                name: 'Walk dog',
-                description: '',
-                progress: 'IN-PROGRESS',
-                createdAt: 'today',
-                dueDate: 'tomorrow',
-                isPastDue: false,
-              }}
-            />
-
-            <IonItemOptions side="end">
-              <IonItemOption color="danger">
-                <IonIcon slot="icon-only" icon={trash}></IonIcon>
-              </IonItemOption>
-            </IonItemOptions>
-          </IonItemSliding>
-
-          <IonItemSliding>
-            <IonItemOptions side="start">
-              <IonItemOption color="success">
-                <IonIcon slot="icon-only" icon={checkmarkCircle}></IonIcon>
-              </IonItemOption>
-            </IonItemOptions>
-
-            <Task
-              task={{
-                id: 3,
-                name: 'Go to gym',
-                description: 'do a lower body workout',
-                progress: 'COMPLETED',
-                createdAt: 'today',
-                dueDate: 'tomorrow',
-                isPastDue: false,
-              }}
-            />
-
-            <IonItemOptions side="end">
-              <IonItemOption color="danger">
-                <IonIcon slot="icon-only" icon={trash}></IonIcon>
-              </IonItemOption>
-            </IonItemOptions>
-          </IonItemSliding>
-
-          <IonItemSliding>
-            <IonItemOptions side="start">
-              <IonItemOption color="success">
-                <IonIcon slot="icon-only" icon={checkmarkCircle}></IonIcon>
-              </IonItemOption>
-            </IonItemOptions>
-
-            <Task
-              task={{
-                id: 3,
-                name: 'Finish book',
-                description: 'left on page 238',
-                progress: 'COMPLETED',
-                createdAt: 'today',
-                dueDate: 'tomorrow',
-                isPastDue: true,
-              }}
-            />
-
-            <IonItemOptions side="end">
-              <IonItemOption color="danger">
-                <IonIcon slot="icon-only" icon={trash}></IonIcon>
-              </IonItemOption>
-            </IonItemOptions>
-          </IonItemSliding>
+                <IonItemOptions side="end">
+                  <IonItemOption color="danger">
+                    <IonIcon slot="icon-only" icon={trash}></IonIcon>
+                  </IonItemOption>
+                </IonItemOptions>
+              </IonItemSliding>
+            );
+          })}
         </IonList>
         <IonFab vertical="bottom" horizontal="end" slot="fixed">
           <IonFabButton onClick={() => history.push('/createtask')}>

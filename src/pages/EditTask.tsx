@@ -85,10 +85,7 @@ const EditTask: React.FC<EditTaskPageProps> = ({ history, match }) => {
           </IonButtons>
           <IonTitle className="title">Edit Task {match.params.id}</IonTitle>
           <IonButtons slot="end">
-            <IonButton
-              className="navAction"
-              onClick={() => history.push('/login')}
-            >
+            <IonButton className="navAction" onClick={() => signOut()}>
               Log out
             </IonButton>
           </IonButtons>
