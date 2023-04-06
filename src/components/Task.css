@@ -6,3 +6,6 @@ ion-button {
   --background: none;
   --background-activated: none;
 }
+.error {
+  color: red;
+}

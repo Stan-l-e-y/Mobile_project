@@ -31,7 +31,7 @@ const Task: React.FC<ContainerProps> = ({ task }) => {
         <IonNote>{task.description}</IonNote>
       </IonLabel>
       {displayBadge(task.progress, task.isPastDue)}
-      {/* <IonIcon slot="end" icon={pencil}></IonIcon> */}
+
       <IonButton routerLink={`/edittask/${task.id}`}>
         <IonIcon slot="icon-only" icon={pencil}></IonIcon>
       </IonButton>
@@ -45,14 +45,6 @@ function displayBadge(
   progress: 'IN-PROGRESS' | 'COMPLETED' | 'NOT-STARTED',
   isPastDue: boolean
 ) {
-  // if (isPastDue) {
-  //   return (
-  //     <IonBadge color="danger" slot="" className="status">
-  //       Past-Due
-  //     </IonBadge>
-  //   );
-  // }
-
   if (progress === 'COMPLETED') {
     return (
       <IonBadge color="success" slot="" className="status">

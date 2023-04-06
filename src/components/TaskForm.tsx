@@ -28,7 +28,7 @@ import moment from 'moment';
 import { CreateTaskInput, createTaskSchema } from '../clientTypes';
 
 interface ContainerProps {
-  task?: ITask;
+  task?: any;
   history: any;
   type: 'CREATE' | 'EDIT';
   profile: any;
@@ -52,6 +52,7 @@ const TaskForm: React.FC<ContainerProps> = ({
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<CreateTaskInput>({
     resolver: zodResolver(createTaskSchema),
     mode: 'onChange',
@@ -63,7 +64,19 @@ const TaskForm: React.FC<ContainerProps> = ({
     },
   });
 
+  useEffect(() => {
+    if (task && task[0]) {
+      reset({
+        name: task[0].name,
+        dueDate: task[0].dueDate,
+        description: task[0].description,
+        progress: task[0].progress,
+      });
+    }
+  }, [reset, task]);
+
   const onSubmit = async (formData: CreateTaskInput) => {
+    //TODO: Make update work, supabase api call
     if (type === 'CREATE') {
       try {
         const { data, error } = await supabase
@@ -79,6 +92,7 @@ const TaskForm: React.FC<ContainerProps> = ({
 
         if (error) {
           console.log(error);
+          showToast({ message: error.message, duration: 5000 });
           throw error;
         }
 
@@ -92,22 +106,34 @@ const TaskForm: React.FC<ContainerProps> = ({
         await hideLoading();
       }
     } else {
-      //
+      try {
+        const { data, error } = await supabase
+          .from('tasks')
+          .update({
+            name: formData.name,
+            description: formData.description,
+            progress: formData.progress,
+            dueDate: formData.dueDate,
+          })
+          .eq('id', task[0].id)
+          .select();
+
+        if (error) {
+          console.log(error);
+          showToast({ message: error.message, duration: 5000 });
+          throw error;
+        }
+
+        if (data) {
+          showToast({ message: 'Successfully edited!', duration: 5000 });
+          history.push({ pathname: '/home' });
+        }
+        await hideLoading();
+      } catch (error: any) {
+        showToast({ message: error.message, duration: 5000 });
+        await hideLoading();
+      }
     }
-    // await showLoading();
-    // const { data, error } = await supabase.auth.signInWithPassword({
-    //   email: formData.email,
-    //   password: formData.password,
-    // });
-    // if (error) {
-    //   await showToast({ message: error.message, duration: 5000 });
-    //   await hideLoading();
-    // }
-    // if (data && !error) {
-    //   await hideLoading();
-    //   history.push('/');
-    // }
-    console.log(formData);
   };
 
   return (
@@ -118,19 +144,21 @@ const TaskForm: React.FC<ContainerProps> = ({
           <IonInput
             placeholder="Enter name"
             required
-            value={taskName}
             onIonChange={(e) => setTaskName(e.target.value)}
             {...register('name')}
           ></IonInput>
+          {errors.name && <div className="error">{errors.name.message}</div>}
         </IonItem>
         <IonItem>
           <IonLabel position="floating">Description</IonLabel>
           <IonInput
             placeholder="Enter description"
-            value={taskDesc}
             onIonChange={(e) => setTaskDesc(e.target.value)}
             {...register('description')}
           ></IonInput>
+          {errors.description && (
+            <div className="error">{errors.description.message}</div>
+          )}
         </IonItem>
         <IonItem className="datePicker">
           <IonLabel>Date due</IonLabel>
@@ -144,14 +172,15 @@ const TaskForm: React.FC<ContainerProps> = ({
               {...register('dueDate')}
             ></IonDatetime>
           </IonModal>
+          {errors.dueDate && (
+            <div className="error">{errors.dueDate.message}</div>
+          )}
         </IonItem>
         <IonItem className="statusSelect">
           {task ? (
             <IonSelect
               interface="popover"
               placeholder="Select Status"
-              selectedText={taskProg}
-              value={taskProg}
               onIonChange={(e) => setTaskProg(e.target.value)}
               {...register('progress')}
             >
@@ -169,6 +198,9 @@ const TaskForm: React.FC<ContainerProps> = ({
               <IonSelectOption value="IN-PROGRESS">In-progress</IonSelectOption>
               <IonSelectOption value="COMPLETED">Completed</IonSelectOption>
             </IonSelect>
+          )}
+          {errors.progress && (
+            <div className="error">{errors.progress.message}</div>
           )}
         </IonItem>
         <IonButton
@@ -190,5 +222,4 @@ function getDateTimeNow() {
   const now = moment();
   const timeZoneOffset = moment().format('Z');
   return now.format(`YYYY-MM-DDTHH:mm:ss${timeZoneOffset}`);
-  // return now;
 }
