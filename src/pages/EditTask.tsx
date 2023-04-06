@@ -10,12 +10,16 @@ import {
   IonBackButton,
   IonTitle,
   IonToolbar,
+  useIonLoading,
+  useIonToast,
 } from '@ionic/react';
 
 import './Auth.css';
 import { RouteComponentProps } from 'react-router';
 import TaskForm from '../components/TaskForm';
 import type { ITask } from '../components/Task';
+import { useState, useEffect } from 'react';
+import { supabase } from '../supa';
 
 interface EditTaskPageProps
   extends RouteComponentProps<{
@@ -33,6 +37,43 @@ const EditTask: React.FC<EditTaskPageProps> = ({ history, match }) => {
     createdAt: 'today',
     dueDate: 'tomorrow',
     isPastDue: false,
+  };
+
+  const [showLoading, hideLoading] = useIonLoading();
+  const [showToast] = useIonToast();
+  const [session] = useState(() => supabase.auth.getSession());
+
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    getProfile();
+  }, [session]);
+  const getProfile = async () => {
+    try {
+      const { data: userData, error: userError } =
+        await supabase.auth.getUser();
+      let { data, error, status } = await supabase
+        .from('profiles')
+        .select(`*`)
+        .eq('id', userData.user!.id)
+        .single();
+
+      if (error && status !== 406) {
+        throw error;
+      }
+
+      if (data) {
+        setProfile(data);
+      }
+      await hideLoading();
+    } catch (error: any) {
+      showToast({ message: error.message, duration: 5000 });
+      await hideLoading();
+    }
+  };
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    history.push('/login');
   };
 
   return (
@@ -53,7 +94,12 @@ const EditTask: React.FC<EditTaskPageProps> = ({ history, match }) => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <TaskForm history={history} task={testTask} type={'EDIT'} />
+      <TaskForm
+        history={history}
+        task={testTask}
+        type={'EDIT'}
+        profile={profile}
+      />
     </IonPage>
   );
 };

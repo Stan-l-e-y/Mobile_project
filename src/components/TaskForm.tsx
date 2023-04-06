@@ -14,6 +14,8 @@ import {
   IonSelectOption,
   IonTitle,
   IonToolbar,
+  useIonLoading,
+  useIonToast,
 } from '@ionic/react';
 
 import './TaskForm.css';
@@ -29,13 +31,21 @@ interface ContainerProps {
   task?: ITask;
   history: any;
   type: 'CREATE' | 'EDIT';
+  profile: any;
 }
 
-const TaskForm: React.FC<ContainerProps> = ({ task, history, type }) => {
+const TaskForm: React.FC<ContainerProps> = ({
+  task,
+  history,
+  type,
+  profile,
+}) => {
   //TODO: create state vars for all fields and error
   const [taskName, setTaskName] = useState<any>(task?.name ?? '');
   const [taskDesc, setTaskDesc] = useState<any>(task?.description ?? '');
   const [taskProg, setTaskProg] = useState<any>(task?.progress ?? '');
+  const [showLoading, hideLoading] = useIonLoading();
+  const [showToast] = useIonToast();
 
   const dateNow = getDateTimeNow();
   const {
@@ -55,7 +65,33 @@ const TaskForm: React.FC<ContainerProps> = ({ task, history, type }) => {
 
   const onSubmit = async (formData: CreateTaskInput) => {
     if (type === 'CREATE') {
-      //
+      try {
+        const { data, error } = await supabase
+          .from('tasks')
+          .insert({
+            name: formData.name,
+            description: formData.description,
+            progress: formData.progress,
+            dueDate: formData.dueDate,
+            user_id: profile.id,
+          })
+          .select();
+
+        if (error) {
+          console.log(error);
+          throw error;
+        }
+
+        if (data) {
+          console.log(data);
+          showToast({ message: 'Successfully created!', duration: 5000 });
+          history.push('/');
+        }
+        await hideLoading();
+      } catch (error: any) {
+        showToast({ message: error.message, duration: 5000 });
+        await hideLoading();
+      }
     } else {
       //
     }
