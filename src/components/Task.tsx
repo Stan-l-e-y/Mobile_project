@@ -45,18 +45,24 @@ function displayBadge(
   progress: 'IN-PROGRESS' | 'COMPLETED' | 'NOT-STARTED',
   isPastDue: boolean
 ) {
-  if (isPastDue) {
-    return (
-      <IonBadge color="danger" slot="" className="status">
-        Past-Due
-      </IonBadge>
-    );
-  }
+  // if (isPastDue) {
+  //   return (
+  //     <IonBadge color="danger" slot="" className="status">
+  //       Past-Due
+  //     </IonBadge>
+  //   );
+  // }
 
   if (progress === 'COMPLETED') {
     return (
       <IonBadge color="success" slot="" className="status">
         Completed
+      </IonBadge>
+    );
+  } else if (isPastDue) {
+    return (
+      <IonBadge color="danger" slot="" className="status">
+        Past-Due
       </IonBadge>
     );
   } else if (progress === 'IN-PROGRESS') {

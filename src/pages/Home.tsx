@@ -29,6 +29,8 @@ import Task from '../components/Task';
 import { supabase } from '../supa';
 import { useEffect, useState } from 'react';
 import moment from 'moment';
+import 'swiper/css';
+import '@ionic/react/css/ionic-swiper.css';
 
 const Home: React.FC<RouteComponentProps> = ({ history }) => {
   const [showLoading, hideLoading] = useIonLoading();
@@ -74,9 +76,8 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
       if (taskError) console.log(taskError);
       if (taskData) {
         //filter tasks, if dueDate is greater than or equal today, up
-        setTasks(taskData);
 
-        tasks.map(async (task) => {
+        let updatedTasks = taskData.map(async (task) => {
           //update in supabase
           if (moment(task.dueDate).toDate() <= new Date()) {
             const { data, error } = await supabase
@@ -86,13 +87,24 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
               .select();
 
             if (error) console.log(error);
-            console.log(data);
-            return data;
+
+            //return updated
+            if (data) {
+              // console.log(data[0]);
+              return data[0];
+            }
           }
 
-          //return updated
           return task;
         });
+
+        Promise.all(updatedTasks)
+          .then((completedTasks) => {
+            setTasks(completedTasks);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       }
     };
     if (profile) {
@@ -103,6 +115,46 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
   const signOut = async () => {
     await supabase.auth.signOut();
     history.push('/login');
+  };
+
+  const getTasks = async () => {
+    const { data: taskData, error: taskError } = await supabase
+      .from('tasks')
+      .select('*')
+      .eq('user_id', profile.id);
+
+    if (taskError) console.log(taskError);
+    if (taskData) {
+      //filter tasks, if dueDate is greater than or equal today, up
+      let updatedTasks = taskData.map(async (task) => {
+        //update in supabase
+        if (moment(task.dueDate).toDate() <= new Date()) {
+          const { data, error } = await supabase
+            .from('tasks')
+            .update({ isPastDue: true })
+            .eq('id', task.id)
+            .select();
+
+          if (error) console.log(error);
+
+          //return updated
+          if (data) {
+            // console.log(data[0]);
+            return data[0];
+          }
+        }
+
+        return task;
+      });
+
+      Promise.all(updatedTasks)
+        .then((completedTasks) => {
+          setTasks(completedTasks);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   };
   return (
     <IonPage>
@@ -124,7 +176,25 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
               <IonItemSliding key={task.id}>
                 <IonItemOptions side="start">
                   <IonItemOption color="success">
-                    <IonIcon slot="icon-only" icon={checkmarkCircle}></IonIcon>
+                    <IonIcon
+                      slot="icon-only"
+                      icon={checkmarkCircle}
+                      onClick={async () => {
+                        const { data, error } = await supabase
+                          .from('tasks')
+                          .update({ progress: 'COMPLETED' })
+                          .eq('id', task.id)
+                          .select();
+
+                        if (error) console.log(error);
+                        if (data)
+                          showToast({
+                            message: 'Task complete!',
+                            duration: 5000,
+                          });
+                        await getTasks();
+                      }}
+                    ></IonIcon>
                   </IonItemOption>
                 </IonItemOptions>
 
@@ -142,7 +212,26 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
 
                 <IonItemOptions side="end">
                   <IonItemOption color="danger">
-                    <IonIcon slot="icon-only" icon={trash}></IonIcon>
+                    <IonIcon
+                      slot="icon-only"
+                      icon={trash}
+                      onClick={async () => {
+                        const { data, error } = await supabase
+                          .from('tasks')
+                          .delete()
+                          .eq('id', task.id)
+                          .select();
+
+                        if (error) console.log(error);
+                        if (data)
+                          showToast({
+                            message: 'Task deleted!',
+                            duration: 5000,
+                          });
+
+                        await getTasks();
+                      }}
+                    ></IonIcon>
                   </IonItemOption>
                 </IonItemOptions>
               </IonItemSliding>
