@@ -18,3 +18,17 @@ export const createSessionSchema = object({
 });
 
 export type CreateSessionInput = TypeOf<typeof createSessionSchema>;
+
+export const createTaskSchema = object({
+  name: string({
+    required_error: 'Task name is required',
+  }).min(3, 'Task name must be at least 3 characters'),
+  description: z
+    .string()
+    .min(1, { message: 'Description must be at least 3 characters' })
+    .optional(),
+  progress: z.enum(['IN-PROGRESS', 'NOT-STARTED', 'COMPLETED']),
+  dueDate: z.coerce.string(),
+});
+
+export type CreateTaskInput = TypeOf<typeof createTaskSchema>;

@@ -53,7 +53,7 @@ const EditTask: React.FC<EditTaskPageProps> = ({ history, match }) => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <TaskForm history={history} task={testTask} />
+      <TaskForm history={history} task={testTask} type={'EDIT'} />
     </IonPage>
   );
 };

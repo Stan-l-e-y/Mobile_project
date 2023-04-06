@@ -35,7 +35,7 @@ const CreateTask: React.FC<RouteComponentProps> = ({ history }) => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <TaskForm history={history} />
+      <TaskForm history={history} type={'CREATE'} />
     </IonPage>
   );
 };
