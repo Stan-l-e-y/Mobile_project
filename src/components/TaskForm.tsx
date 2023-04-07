@@ -40,14 +40,12 @@ const TaskForm: React.FC<ContainerProps> = ({
   type,
   profile,
 }) => {
-  //TODO: create state vars for all fields and error
-  const [taskName, setTaskName] = useState<any>(task?.name ?? '');
-  const [taskDesc, setTaskDesc] = useState<any>(task?.description ?? '');
-  const [taskProg, setTaskProg] = useState<any>(task?.progress ?? '');
   const [showLoading, hideLoading] = useIonLoading();
   const [showToast] = useIonToast();
 
   const dateNow = getDateTimeNow();
+
+  //Allows us to track form changes, error handle and validation
   const {
     register,
     handleSubmit,
@@ -76,7 +74,6 @@ const TaskForm: React.FC<ContainerProps> = ({
   }, [reset, task]);
 
   const onSubmit = async (formData: CreateTaskInput) => {
-    //TODO: Make update work, supabase api call
     if (type === 'CREATE') {
       try {
         const { data, error } = await supabase
@@ -106,6 +103,7 @@ const TaskForm: React.FC<ContainerProps> = ({
         await hideLoading();
       }
     } else {
+      //User is attempting to update a task
       try {
         const { data, error } = await supabase
           .from('tasks')
@@ -114,6 +112,8 @@ const TaskForm: React.FC<ContainerProps> = ({
             description: formData.description,
             progress: formData.progress,
             dueDate: formData.dueDate,
+            isPastDue:
+              moment(formData.dueDate).toDate() <= new Date() ? true : false,
           })
           .eq('id', task[0].id)
           .select();
@@ -144,7 +144,6 @@ const TaskForm: React.FC<ContainerProps> = ({
           <IonInput
             placeholder="Enter name"
             required
-            onIonChange={(e) => setTaskName(e.target.value)}
             {...register('name')}
           ></IonInput>
           {errors.name && <div className="error">{errors.name.message}</div>}
@@ -153,7 +152,6 @@ const TaskForm: React.FC<ContainerProps> = ({
           <IonLabel position="floating">Description</IonLabel>
           <IonInput
             placeholder="Enter description"
-            onIonChange={(e) => setTaskDesc(e.target.value)}
             {...register('description')}
           ></IonInput>
           {errors.description && (
@@ -181,7 +179,6 @@ const TaskForm: React.FC<ContainerProps> = ({
             <IonSelect
               interface="popover"
               placeholder="Select Status"
-              onIonChange={(e) => setTaskProg(e.target.value)}
               {...register('progress')}
             >
               <IonSelectOption value="NOT-STARTED">Not-started</IonSelectOption>

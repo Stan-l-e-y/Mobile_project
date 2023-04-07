@@ -90,7 +90,6 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
 
             //return updated
             if (data) {
-              // console.log(data[0]);
               return data[0];
             }
           }
@@ -139,7 +138,6 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
 
           //return updated
           if (data) {
-            // console.log(data[0]);
             return data[0];
           }
         }
