@@ -31,40 +31,71 @@ import { useEffect, useState } from 'react';
 import moment from 'moment';
 import 'swiper/css';
 import '@ionic/react/css/ionic-swiper.css';
+import { useCookies } from 'react-cookie';
 
 const Home: React.FC<RouteComponentProps> = ({ history }) => {
   const [showLoading, hideLoading] = useIonLoading();
   const [showToast] = useIonToast();
+  // supabase.auth.getSession();
   const [session] = useState(() => supabase.auth.getSession());
   const [tasks, setTasks] = useState<any[]>([]);
-
   const [profile, setProfile] = useState<any>('');
+
+  const [get] = useCookies(['my-access-token']);
+  const [get2] = useCookies(['my-refresh-token']);
+
+  // if (get2['my-refresh-token'] && get['my-access-token']) {
+  //   console.log('wtf');
+  //   supabase.auth.setSession({
+  //     refresh_token: get2['my-refresh-token'],
+  //     access_token: get['my-access-token'],
+  //   });
+  // } else {
+  //   // make sure you handle this case!
+  //   // throw new Error('User is not authenticated.')
+  // }
+
+  // supabase.auth.getUser();
+
+  //TODO: try to fetch cookie
   useEffect(() => {
     const getProfile = async () => {
       try {
         const { data: userData, error: userError } =
           await supabase.auth.getUser();
+
         let { data, error, status } = await supabase
           .from('profiles')
           .select(`*`)
           .eq('id', userData.user!.id)
           .single();
 
+        if (error) {
+          console.log('bad');
+        }
+
         if (error && status !== 406) {
           throw error;
         }
 
-        if (data) {
+        if (data && !profile) {
           setProfile(data);
+          //reload here
         }
         await hideLoading();
       } catch (error: any) {
-        showToast({ message: error.message, duration: 5000 });
+        console.log(error.message);
+        showToast({ message: 'Please log in', duration: 5000 });
         await hideLoading();
       }
     };
+
     getProfile();
-  }, [hideLoading, showToast, session]);
+  }, [hideLoading, showToast, profile, session]);
+
+  useEffect(() => {
+    console.log('use');
+  }, []);
 
   useEffect(() => {
     const getTasks = async () => {

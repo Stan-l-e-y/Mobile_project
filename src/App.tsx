@@ -25,26 +25,59 @@ import SignUp from './pages/SignUp';
 import LogIn from './pages/LogIn';
 import CreateTask from './pages/CreateTask';
 import EditTask from './pages/EditTask';
+import { supabase } from './supa';
+import { useEffect, useState } from 'react';
+import { Session } from '@supabase/supabase-js';
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <IonRouterOutlet>
-        <Route exact path="/home" component={Home}>
-          {/* <Home /> */}
-        </Route>
-        <Route exact path="/createtask" component={CreateTask} />
-        <Route exact path="/signup" component={SignUp} />
-        <Route exact path="/login" component={LogIn} />
-        <Route path="/edittask/:id" component={EditTask} />
-        <Route exact path="/">
-          <Redirect to="/home" />
-        </Route>
-      </IonRouterOutlet>
-    </IonReactRouter>
-  </IonApp>
-);
+const App: React.FC = () => {
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+      // delete cookies on sign out
+      const expires = new Date(0).toUTCString();
+      document.cookie = `my-access-token=; path=/; expires=${expires}; SameSite=Lax; secure`;
+      document.cookie = `my-refresh-token=; path=/; expires=${expires}; SameSite=Lax; secure`;
+    } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+      console.log('siggg');
+      const maxAge = 100 * 365 * 24 * 60 * 60; // 100 years, never expires
+      document.cookie = `my-access-token=${session?.access_token}; path=/; max-age=${maxAge}; SameSite=Lax; secure`;
+      document.cookie = `my-refresh-token=${session?.refresh_token}; path=/; max-age=${maxAge}; SameSite=Lax; secure`;
+    }
+  });
+  const [session, setSession] = useState<any>(null);
+  useEffect(() => {
+    async function handleAsync() {
+      const { data, error } = await supabase.auth.getSession();
+      setSession(data);
+      supabase.auth.onAuthStateChange((_event, session) => {
+        setSession(session);
+      });
+    }
+
+    if (!session) {
+      console.log(session);
+      handleAsync();
+    }
+  }, [session]);
+  return (
+    <IonApp>
+      <IonReactRouter>
+        <IonRouterOutlet>
+          <Route path="/home" component={session ? Home : LogIn}>
+            {/* <Home /> */}
+          </Route>
+          <Route exact path="/createtask" component={CreateTask} />
+          <Route exact path="/signup" component={SignUp} />
+          <Route exact path="/login" component={LogIn} />
+          <Route path="/edittask/:id" component={EditTask} />
+          <Route exact path="/">
+            <Redirect to="/home" />
+          </Route>
+        </IonRouterOutlet>
+      </IonReactRouter>
+    </IonApp>
+  );
+};
 
 export default App;

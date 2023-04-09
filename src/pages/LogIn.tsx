@@ -48,7 +48,7 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
 
     if (data && !error) {
       await hideLoading();
-      history.push('/');
+      history.push('/home');
     }
   };
 
