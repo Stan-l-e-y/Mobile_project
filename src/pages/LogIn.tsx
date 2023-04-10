@@ -20,6 +20,8 @@ import { useForm } from 'react-hook-form';
 import { CreateSessionInput, createSessionSchema } from '../clientTypes';
 import { supabase } from '../supa';
 
+// Stanley Tsonev 101339387
+
 const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
   const [showLoading, hideLoading] = useIonLoading();
   const [showToast] = useIonToast();

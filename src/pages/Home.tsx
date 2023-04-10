@@ -40,10 +40,12 @@ import {
   useTasks,
 } from '../store';
 
+// Stanley Tsonev 101339387
+
 const Home: React.FC<RouteComponentProps> = ({ history }) => {
   const [showLoading, hideLoading] = useIonLoading();
   const [showToast] = useIonToast();
-  // supabase.auth.getSession();
+
   const session = useSession();
 
   const tasks = useTasks();
@@ -52,24 +54,6 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
   const profile = useProfile();
   const setProfile = useSetProfile();
 
-  const [get] = useCookies(['my-access-token']);
-  const [get2] = useCookies(['my-refresh-token']);
-  // console.log(session);
-
-  // if (get2['my-refresh-token'] && get['my-access-token']) {
-  //   console.log('wtf');
-  //   supabase.auth.setSession({
-  //     refresh_token: get2['my-refresh-token'],
-  //     access_token: get['my-access-token'],
-  //   });
-  // } else {
-  //   // make sure you handle this case!
-  //   // throw new Error('User is not authenticated.')
-  // }
-
-  // supabase.auth.getUser();
-
-  //TODO: try to fetch cookie
   useEffect(() => {
     const getProfile = async () => {
       try {

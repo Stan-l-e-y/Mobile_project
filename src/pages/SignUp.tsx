@@ -20,6 +20,8 @@ import { useForm } from 'react-hook-form';
 import { CreateUserInput, createUserSchema } from '../clientTypes';
 import { supabase } from '../supa';
 
+// Stanley Tsonev 101339387
+
 const SignUp: React.FC<RouteComponentProps> = (props) => {
   const [showLoading, hideLoading] = useIonLoading();
   const [showToast] = useIonToast();

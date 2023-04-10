@@ -9,6 +9,8 @@ import {
 import { pencil } from 'ionicons/icons';
 import './Task.css';
 
+// Stanley Tsonev 101339387
+
 export type ITask = {
   id: number;
   name: string;

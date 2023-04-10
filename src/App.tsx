@@ -36,6 +36,8 @@ import {
   useSetTasks,
 } from './store';
 
+// Stanley Tsonev 101339387
+
 setupIonicReact();
 
 const App: React.FC = () => {

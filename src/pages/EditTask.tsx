@@ -22,24 +22,14 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../supa';
 import moment from 'moment';
 
+// Stanley Tsonev 101339387
+
 interface EditTaskPageProps
   extends RouteComponentProps<{
     id: string;
   }> {}
 
 const EditTask: React.FC<EditTaskPageProps> = ({ history, match }) => {
-  //TODO: use match.params.id and fetch the task from api, pass task to TaskForm
-
-  const testTask: ITask = {
-    id: 1,
-    name: 'Wash Dishes',
-    description: 'try to finish by 5pm',
-    progress: 'IN-PROGRESS',
-    createdAt: 'today',
-    dueDate: 'tomorrow',
-    isPastDue: false,
-  };
-
   const [showLoading, hideLoading] = useIonLoading();
   const [showToast] = useIonToast();
   const [session] = useState(() => supabase.auth.getSession());
