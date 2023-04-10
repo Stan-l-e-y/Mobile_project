@@ -28,10 +28,22 @@ import EditTask from './pages/EditTask';
 import { supabase } from './supa';
 import { useEffect, useState } from 'react';
 import { Session } from '@supabase/supabase-js';
+import {
+  useProfile,
+  useSession,
+  useSetProfile,
+  useSetSession,
+  useSetTasks,
+} from './store';
 
 setupIonicReact();
 
 const App: React.FC = () => {
+  const session = useSession();
+  const setSession = useSetSession();
+  const setProfile = useSetProfile();
+  const profile = useProfile();
+  const setTasks = useSetTasks();
   supabase.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
       // delete cookies on sign out
@@ -45,11 +57,11 @@ const App: React.FC = () => {
       document.cookie = `my-refresh-token=${session?.refresh_token}; path=/; max-age=${maxAge}; SameSite=Lax; secure`;
     }
   });
-  const [session, setSession] = useState<any>(null);
+
   useEffect(() => {
     async function handleAsync() {
       const { data, error } = await supabase.auth.getSession();
-      setSession(data);
+      setSession(data.session);
       supabase.auth.onAuthStateChange((_event, session) => {
         setSession(session);
       });
@@ -59,12 +71,26 @@ const App: React.FC = () => {
       console.log(session);
       handleAsync();
     }
-  }, [session]);
+  }, [session, setSession]);
+
+  useEffect(() => {
+    if (session) {
+      console.log('setinggg');
+      setProfile(supabase);
+    }
+  }, [session, setProfile]);
+
+  useEffect(() => {
+    if (profile) {
+      setTasks(supabase, profile.id);
+    }
+  }, [profile, setTasks]);
+
   return (
     <IonApp>
       <IonReactRouter>
         <IonRouterOutlet>
-          <Route path="/home" component={session ? Home : LogIn}>
+          <Route path="/home" component={Home}>
             {/* <Home /> */}
           </Route>
           <Route exact path="/createtask" component={CreateTask} />

@@ -32,17 +32,29 @@ import moment from 'moment';
 import 'swiper/css';
 import '@ionic/react/css/ionic-swiper.css';
 import { useCookies } from 'react-cookie';
+import {
+  useProfile,
+  useSession,
+  useSetProfile,
+  useSetTasks,
+  useTasks,
+} from '../store';
 
 const Home: React.FC<RouteComponentProps> = ({ history }) => {
   const [showLoading, hideLoading] = useIonLoading();
   const [showToast] = useIonToast();
   // supabase.auth.getSession();
-  const [session] = useState(() => supabase.auth.getSession());
-  const [tasks, setTasks] = useState<any[]>([]);
-  const [profile, setProfile] = useState<any>('');
+  const session = useSession();
+
+  const tasks = useTasks();
+  const setTasks = useSetTasks();
+
+  const profile = useProfile();
+  const setProfile = useSetProfile();
 
   const [get] = useCookies(['my-access-token']);
   const [get2] = useCookies(['my-refresh-token']);
+  // console.log(session);
 
   // if (get2['my-refresh-token'] && get['my-access-token']) {
   //   console.log('wtf');
@@ -61,27 +73,7 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
   useEffect(() => {
     const getProfile = async () => {
       try {
-        const { data: userData, error: userError } =
-          await supabase.auth.getUser();
-
-        let { data, error, status } = await supabase
-          .from('profiles')
-          .select(`*`)
-          .eq('id', userData.user!.id)
-          .single();
-
-        if (error) {
-          console.log('bad');
-        }
-
-        if (error && status !== 406) {
-          throw error;
-        }
-
-        if (data && !profile) {
-          setProfile(data);
-          //reload here
-        }
+        setProfile(supabase);
         await hideLoading();
       } catch (error: any) {
         console.log(error.message);
@@ -91,7 +83,7 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
     };
 
     getProfile();
-  }, [hideLoading, showToast, profile, session]);
+  }, [hideLoading, showToast, profile, session, setProfile]);
 
   useEffect(() => {
     console.log('use');
@@ -99,91 +91,21 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
 
   useEffect(() => {
     const getTasks = async () => {
-      const { data: taskData, error: taskError } = await supabase
-        .from('tasks')
-        .select('*')
-        .eq('user_id', profile.id);
-
-      if (taskError) console.log(taskError);
-      if (taskData) {
-        //filter tasks, if dueDate is greater than or equal today, up
-
-        let updatedTasks = taskData.map(async (task) => {
-          //update in supabase
-          if (moment(task.dueDate).toDate() <= new Date()) {
-            const { data, error } = await supabase
-              .from('tasks')
-              .update({ isPastDue: true })
-              .eq('id', task.id)
-              .select();
-
-            if (error) console.log(error);
-
-            //return updated
-            if (data) {
-              return data[0];
-            }
-          }
-
-          return task;
-        });
-
-        Promise.all(updatedTasks)
-          .then((completedTasks) => {
-            setTasks(completedTasks);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      }
+      setTasks(supabase, profile.id);
     };
     if (profile) {
       getTasks();
     }
-  }, [profile]);
+  }, [profile, setTasks]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    setProfile(supabase, true);
     history.push('/login');
   };
 
   const getTasks = async () => {
-    const { data: taskData, error: taskError } = await supabase
-      .from('tasks')
-      .select('*')
-      .eq('user_id', profile.id);
-
-    if (taskError) console.log(taskError);
-    if (taskData) {
-      //filter tasks, if dueDate is greater than or equal today, up
-      let updatedTasks = taskData.map(async (task) => {
-        //update in supabase
-        if (moment(task.dueDate).toDate() <= new Date()) {
-          const { data, error } = await supabase
-            .from('tasks')
-            .update({ isPastDue: true })
-            .eq('id', task.id)
-            .select();
-
-          if (error) console.log(error);
-
-          //return updated
-          if (data) {
-            return data[0];
-          }
-        }
-
-        return task;
-      });
-
-      Promise.all(updatedTasks)
-        .then((completedTasks) => {
-          setTasks(completedTasks);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
+    setTasks(supabase, profile.id);
   };
   return (
     <IonPage>
@@ -195,12 +117,14 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
               Log Out
             </IonButton>
           </IonButtons>
-          <div className="welcome">Welcome, {profile.first_name}!</div>
+          <div className="welcome">
+            Welcome, {profile ? profile.first_name : ''}!
+          </div>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen={true}>
         <IonList>
-          {tasks.map((task) => {
+          {tasks.map((task: any) => {
             return (
               <IonItemSliding key={task.id}>
                 <IonItemOptions side="start">

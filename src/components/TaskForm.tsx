@@ -26,6 +26,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import moment from 'moment';
 import { CreateTaskInput, createTaskSchema } from '../clientTypes';
+import { useSetTasks } from '../store';
 
 interface ContainerProps {
   task?: any;
@@ -42,6 +43,7 @@ const TaskForm: React.FC<ContainerProps> = ({
 }) => {
   const [showLoading, hideLoading] = useIonLoading();
   const [showToast] = useIonToast();
+  const setTasks = useSetTasks();
 
   const dateNow = getDateTimeNow();
 
@@ -94,6 +96,7 @@ const TaskForm: React.FC<ContainerProps> = ({
         }
 
         if (data) {
+          setTasks(supabase, profile.id);
           showToast({ message: 'Successfully created!', duration: 5000 });
           history.push({ pathname: '/home' });
         }
@@ -125,6 +128,7 @@ const TaskForm: React.FC<ContainerProps> = ({
         }
 
         if (data) {
+          setTasks(supabase, profile.id);
           showToast({ message: 'Successfully edited!', duration: 5000 });
           history.push({ pathname: '/home' });
         }
